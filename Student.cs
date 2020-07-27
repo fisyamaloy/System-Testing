@@ -61,24 +61,20 @@ namespace Проект.Рестарт
             ((Form)((Button)sender).Parent).Close();
             DB db = new DB();
             Button button = (Button)sender;
-            Test.TimeBeforeEndTest = 20;
-            // Test.TimeBeforeEndTest = Convert.ToDouble(db.GetValue("SELECT testtimer FROM tests"));
-            Test.ID = Convert.ToInt32(db.GetValue("SELECT id FROM tests WHERE testname = '" + button.Text + "'"));
-            Test.Name = button.Text;
-            Test.Questions = db.GetDataList("SELECT question_name FROM questions WHERE parent_test = '" + Test.ID + "'");
-            Test.Shuffle();
-            Test.ShowQuestionFormAndAnswers();
-            Test.TimerAction();
+            int ID = Convert.ToInt32(db.GetValue("SELECT id FROM tests WHERE testname = '" + button.Text + "'"));
+            List<string> Questions = db.GetDataList("SELECT question_name FROM questions WHERE parent_test = '" + ID + "'");
+            double TimeBeforeEndTest = Convert.ToDouble(db.GetValue("SELECT testtimer FROM tests"));
+            Test.initialisation(ID, button.Text, Questions, TimeBeforeEndTest);
         }
     }
 
     public static class Test
     {
-        public static string Name;
-        public static List<string> Questions;
-        public static int ActiveQuestionIndex = 0;
-        public static int ID;
-        public static double TimeBeforeEndTest;
+        private static string Name;
+        private static List<string> Questions;
+        private static int ActiveQuestionIndex = 0;
+        private static int ID;
+        private static double TimeBeforeEndTest;
 
         private static int _questionID;
         private static double _mark = 0;
@@ -87,6 +83,17 @@ namespace Проект.Рестарт
         private static Timer _timer;
         private static Label _timerTimeLabel;
         private static DB _db = new DB();
+
+        public static void initialisation(int id, string name, List<string> questions, double time)
+        {
+            ID = id;
+            Name = name;
+            Questions = questions;
+            TimeBeforeEndTest = time;
+            Shuffle();
+            ShowQuestionFormAndAnswers();
+            TimerAction();
+        }
 
         public static void TimerAction()
         {
